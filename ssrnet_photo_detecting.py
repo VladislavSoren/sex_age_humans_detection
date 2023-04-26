@@ -1,15 +1,22 @@
+import logging
 import os
 import cv2
+import face_detection
 import numpy as np
 import argparse
+
+from PIL import Image
+
 from demo.SSRNET_model import SSR_net, SSR_net_general
 import sys
 import timeit
 from moviepy.editor import *
 from keras import backend as K
 import time
-import face_detection
-from funcs.img_process import *
+from funcs.img_process import get_y_coords, get_smaller_img
+# from streamlit_service import logger
+# from streamlit.logger import get_logger
+# logger = get_logger(__name__)
 
 def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
                font_scale=1, thickness=2):
@@ -41,23 +48,13 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
 
         yw1, yw2 = get_y_coords(yw1, yw2, xw1, xw2, img_h)
 
-        # cv2.imshow("result", input_img[yw1:yw2 + 1, xw1:xw2 + 1, :])
-        # cv2.waitKey(1)
-        # time.sleep(2)
-
-        # Вырезаем лицо и кладём на шаблон faces
-        # resize_img = cv2.resize(input_img[yw1:yw2 + 1, xw1:xw2 + 1, :], (img_size, img_size))
-        # cv2.imshow("result", resize_img)
-        # cv2.waitKey(1)
-        # time.sleep(2)
-
         '''
         Если вы увеличиваете изображение, лучше использовать интерполяцию INTER_LINEAR или INTER_CUBIC(лучше, но медленней). 
         Если вы сжимаете изображение, лучше использовать интерполяцию INTER_AREA 
         '''
         box_size = yw2 - yw1
 
-        # Изменяем размер изображения применяя нужную интерполяцию
+        # Изменяем размер изображения применяя нужную интерполяцию (Вырезаем лицо и кладём на шаблон faces)
         if img_size > box_size:
             faces[i, :, :, :] = cv2.resize(souurce_img[yw1:yw2 + 1, xw1:xw2 + 1, :], (img_size, img_size),
                                            interpolation=cv2.INTER_CUBIC)
@@ -70,6 +67,7 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
         cv2.rectangle(input_img, (x1, y1), (x2, y2), (255, 0, 0), 2)
         cv2.rectangle(input_img, (xw1, yw1), (xw2, yw2), (0, 0, 255), 2)
 
+        # Вывод изображений детектированных лиц
         # cv2.imshow("result", input_img)
         # cv2.waitKey(1)
         # time.sleep(2)
@@ -83,7 +81,6 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
         # predict ages and genders of the detected faces
         predicted_ages = model.predict(faces)
         predicted_genders = model_gender.predict(faces)
-        
 
     # draw results
     for i, (x,y,w,h,_) in enumerate(detected):
@@ -103,7 +100,6 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
     
     elapsed_time = timeit.default_timer()-start_time
     time_network = time_network + elapsed_time
-    
 
     start_time = timeit.default_timer()
 
@@ -112,6 +108,8 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
 
     return input_img,time_network,time_plot
 
+
+# Функция разметки изображений из указынной директории (результаты разметки так же кладутся в указынную диркеторию)
 def main():
 
     K.set_learning_phase(0) # make sure its testing mode
@@ -166,15 +164,65 @@ def main():
 
         faces = np.empty((len(detections), img_size, img_size, 3))
 
-        input_img,time_network,time_plot = draw_results(detections,input_img,faces,ad,img_size,img_w,img_h,model,model_gender,time_detection,time_network,time_plot)
+        input_img, time_network, time_plot = draw_results(detections,input_img,faces,ad,img_size,img_w,img_h,model,model_gender,time_detection,time_network,time_plot)
         cv2.imwrite(save_path+str(img_idx)+'.png',input_img)
 
         #Show the time cost (fps)
         print('avefps_time_detection:',1/time_detection)
         print('===============================')
         cv2.waitKey(1)
-        time.sleep(3)
         
+    return input_img
+
+
+# Функция разметки одного изображения (принимает изображение от пользователя и возвращает размеченное)
+def get_tagged_img(input_img, logger, img_size, detector, model, model_gender):
+
+    '''
+        Inputs:
+            input_img - исходное изображение (numpy массив)
+            logger - объект streamlit логгера
+            img_size - размер изображения для подачи в нейронки (конфигурируем модели под данный размер 64*64)
+            detector - модель для детектирования лиц
+            model - модель для определения возраста
+            model_gender - модель для определения пола
+
+        Outputs:
+            input_img - размеченное изображение (numpy массив)
+    '''
+
+    # Засекаем общее время выполнения
+    all_time = time.time()
+
+    # Коэффициент расширения бокса
+    ad = 0.5
+
+    # Динамически уменьшаем размерность изображения с помощью интерполяции
+    input_img = get_smaller_img(input_img)
+
+    # Getting height and weight of image
+    img_h, img_w, _ = np.shape(input_img)
+
+    time_detection = 0
+    time_network = 0
+    time_plot = 0
+
+    # Face detecting
+    time_tmp = time.time()
+    detections = detector.detect(input_img)
+    logger.info(f"Face detecting: {time.time() - time_tmp}")
+
+    # Создание шаблонного массива для его последующего наполнения
+    faces = np.empty((len(detections), img_size, img_size, 3))
+
+    # Sex&age detecting
+    time_tmp = time.time()
+    input_img, time_network, time_plot = draw_results(detections, input_img, faces, ad, img_size, img_w, img_h,
+                                                      model, model_gender, time_detection, time_network, time_plot)
+    logger.info(f"Sex&age detecting: {time.time() - time_tmp}")
+    logger.info(f"all_time of execution: {time.time() - all_time}")
+
+    return input_img
 
 
 if __name__ == '__main__':
