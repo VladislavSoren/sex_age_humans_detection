@@ -1,6 +1,9 @@
+import base64
 import time
+from pathlib import Path
 
 import face_detection
+from PIL import Image
 from keras import backend as K
 
 import cv2
@@ -52,14 +55,49 @@ def get_models():
 
     return img_size, detector, model, model_gender
 
+
+@st.cache_data()
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+
+def set_png_as_page_bg(png_file):
+    bin_str = get_base64_of_bin_file(png_file)
+
+    page_bg_img = '''
+    <style>
+    .stApp {
+    background-image: url("data:image/png;base64,%s");
+    background-size: cover;
+    }
+    </style>
+    ''' % bin_str
+
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+    return
+
+
 # Конфигурирование страницы
-st.set_page_config(page_title="Пол_возраст", layout="wide", page_icon="random")
+im = Image.open(Path.cwd()/'APP_icon'/'Иконка.png')
+st.set_page_config(page_title="Пол_возраст", layout="wide", page_icon=im)
+
+# Устанавливаем фон
+set_png_as_page_bg(Path.cwd()/'APP_bg'/'Bg.jpg')
 
 # Подгружаем модели при иницилаизации сервиса
 img_size, detector, model, model_gender = get_models()
 
 # Заголовок сервиса
 st.header('Сервис по распознаванию пола и возраста')
+
+url = 'https://t.me/VladislavSoren'
+full_ref = f'<a href="{url}" style="color: #0d0aab">by FriendlyDev</a>'
+st.markdown(f"<h2 style='font-size: 20px; text-align: right; color: black;'>{full_ref}</h2>", unsafe_allow_html=True)
+
+# components.html(f'''
+# <p>{html_content} <font size="3"><a href="{url}" style="color: #02a3a1">{'  '}{group_name}   ({status_gr})</a><font></p>
 
 # Виджет подгрузки контента
 input_img = st.file_uploader("Choose video", type=["png", "jpg", "jpeg"])
