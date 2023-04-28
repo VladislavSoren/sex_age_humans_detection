@@ -96,9 +96,6 @@ url = 'https://t.me/VladislavSoren'
 full_ref = f'<a href="{url}" style="color: #0d0aab">by FriendlyDev</a>'
 st.markdown(f"<h2 style='font-size: 20px; text-align: right; color: black;'>{full_ref}</h2>", unsafe_allow_html=True)
 
-# components.html(f'''
-# <p>{html_content} <font size="3"><a href="{url}" style="color: #02a3a1">{'  '}{group_name}   ({status_gr})</a><font></p>
-
 # Виджет подгрузки контента
 input_img = st.file_uploader("Choose video", type=["png", "jpg", "jpeg"])
 
@@ -114,3 +111,7 @@ if input_img is not None:
     cv2.imwrite(f'users_detections/{input_img.name}', tagged_img)
 
     st.image(tagged_img, channels="BGR")
+else:
+    st.header('preview')
+    prev_img = cv2.imread('preview/prev_img.jpg')
+    st.image(prev_img, channels="BGR")
