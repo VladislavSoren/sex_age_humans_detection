@@ -3,3 +3,5 @@ opencv-python==4.6.0.66
 moviepy==1.0.3
 face-detection==0.2.2
 streamlit==1.21.0
+uvicorn[standard]
+fastapi==0.100.0
