@@ -102,7 +102,8 @@ input_img = st.file_uploader("Choose video", type=["png", "jpg", "jpeg"])
 # run only when user uploads file
 if input_img is not None:
 
-    file_bytes = np.asarray(bytearray(input_img.read()), dtype=np.uint8)
+    image_input = input_img.read()
+    file_bytes = np.asarray(bytearray(image_input), dtype=np.uint8)
     input_img_cv = cv2.imdecode(file_bytes, 1)
 
     # Получаепм размеченное фото

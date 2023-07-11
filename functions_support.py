@@ -1,15 +1,18 @@
+import io
 import logging
 import time
 
 import face_detection
+import numpy
+from PIL import Image
 from keras import backend as K
 
 # импорт модуля распознования
 from demo.SSRNET_model import SSR_net, SSR_net_general
 
 import warnings
-warnings.filterwarnings('ignore')
 
+warnings.filterwarnings('ignore')
 
 # Параметры логирования
 logging.basicConfig(filename="models_init.log",
@@ -17,8 +20,8 @@ logging.basicConfig(filename="models_init.log",
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
-def get_models():
 
+def get_models():
     # Initialize detector1
     time_tmp = time.time()
     detector = face_detection.build_detector("DSFDDetector", confidence_threshold=.5, nms_iou_threshold=.3)
@@ -44,3 +47,13 @@ def get_models():
     logging.info(f"Building models: {time.time() - time_tmp}")
 
     return img_size, detector, model, model_gender
+
+
+def show_input_image(image_bytes):
+    image = Image.open(io.BytesIO(image_bytes))
+    image.show()
+
+
+def show_tagged_image(tagged_img: numpy.ndarray):
+    img = Image.fromarray(tagged_img, 'RGB')
+    img.show()
