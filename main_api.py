@@ -1,4 +1,7 @@
+import os
+
 import cv2
+import numpy
 import numpy as np
 import base64
 
@@ -64,13 +67,14 @@ def get_image(json_input: PredictRequest):
     # show_input_image()
 
     # image preprocessing
-    file_bytes = np.asarray(bytearray(image_bytes), dtype=np.uint8)
-    input_image_cv = cv2.imdecode(file_bytes, 1)
+    file_bytes: numpy.ndarray = np.asarray(bytearray(image_bytes), dtype=np.uint8)
+    input_image_cv: numpy.ndarray = cv2.imdecode(file_bytes, 1)
 
     # receiving tagged image
     tagged_image = get_tagged_img(input_image_cv, logging, img_size, detector, model, model_gender)
 
     # saving tagged image
+    if not os.path.exists('users_detections'): os.makedirs('users_detections')
     save_path = f'users_detections/{json_input.image_name}'
     cv2.imwrite(save_path, tagged_image)
 
@@ -85,7 +89,7 @@ def get_image(json_input: PredictRequest):
 
 if __name__ == '__main__':
     uvicorn.run(
-        "main:app",
+        "main_api:app",
         port=9988,
         # reload=True,
     )

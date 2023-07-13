@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import base64
@@ -71,6 +73,7 @@ def get_image(json_input: PredictRequest):
     tagged_image = get_tagged_img(input_image_cv, logging, img_size, detector, model, model_gender)
 
     # saving tagged image
+    if not os.path.exists('users_detections'): os.makedirs('users_detections')
     save_path = f'users_detections/{json_input.image_name}'
     cv2.imwrite(save_path, tagged_image)
 
