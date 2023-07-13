@@ -65,20 +65,20 @@ def get_image(json_input: PredictRequest):
 
     # image preprocessing
     file_bytes = np.asarray(bytearray(image_bytes), dtype=np.uint8)
-    input_img_cv = cv2.imdecode(file_bytes, 1)
+    input_image_cv = cv2.imdecode(file_bytes, 1)
 
     # receiving tagged image
-    tagged_img = get_tagged_img(input_img_cv, logging, img_size, detector, model, model_gender)
+    tagged_image = get_tagged_img(input_image_cv, logging, img_size, detector, model, model_gender)
 
     # saving tagged image
     save_path = f'users_detections/{json_input.image_name}'
-    cv2.imwrite(save_path, tagged_img)
+    cv2.imwrite(save_path, tagged_image)
 
-    # show_tagged_image(tagged_img)
+    # show_tagged_image(tagged_image)
 
     # serialization
     json_out = {}
-    json_out['tagged_img'] = image_bytes_to_str(save_path)
+    json_out['tagged_image'] = image_bytes_to_str(save_path)
 
     return json_out
 

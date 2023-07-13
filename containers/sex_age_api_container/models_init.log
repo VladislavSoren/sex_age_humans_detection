@@ -1,0 +1,41 @@
+2023-07-12 16:48:42,296 - root - INFO - Initialize detector: 1.8037145137786865
+2023-07-12 16:48:43,563 - root - INFO - Building models: 1.2662208080291748
+2023-07-12 16:48:55,004 - root - INFO - Face detecting: 1.3104567527770996
+2023-07-12 16:48:56,118 - root - INFO - Sex&age detecting: 1.1145098209381104
+2023-07-12 16:48:56,119 - root - INFO - all_time of execution: 2.425482988357544
+2023-07-12 19:36:21,940 - root - INFO - Face detecting: 1.482724905014038
+2023-07-12 19:36:22,042 - root - INFO - Sex&age detecting: 0.10196208953857422
+2023-07-12 19:36:22,042 - root - INFO - all_time of execution: 1.5850293636322021
+2023-07-12 19:38:51,890 - root - INFO - Face detecting: 1.625014066696167
+2023-07-12 19:38:51,993 - root - INFO - Sex&age detecting: 0.1028444766998291
+2023-07-12 19:38:51,993 - root - INFO - all_time of execution: 1.7281994819641113
+2023-07-12 19:39:11,417 - root - INFO - Face detecting: 1.598860502243042
+2023-07-12 19:39:11,527 - root - INFO - Sex&age detecting: 0.1095879077911377
+2023-07-12 19:39:11,527 - root - INFO - all_time of execution: 1.7088515758514404
+2023-07-12 19:43:36,759 - root - INFO - Face detecting: 1.6409099102020264
+2023-07-12 19:43:36,860 - root - INFO - Sex&age detecting: 0.10057973861694336
+2023-07-12 19:43:36,860 - root - INFO - all_time of execution: 1.7418339252471924
+2023-07-12 19:45:35,490 - root - INFO - Face detecting: 1.4323146343231201
+2023-07-12 19:45:35,592 - root - INFO - Sex&age detecting: 0.10159635543823242
+2023-07-12 19:45:35,592 - root - INFO - all_time of execution: 1.5342605113983154
+2023-07-12 21:39:02,434 - root - INFO - Face detecting: 1.1710546016693115
+2023-07-12 21:39:02,534 - root - INFO - Sex&age detecting: 0.10023689270019531
+2023-07-12 21:39:02,534 - root - INFO - all_time of execution: 1.2716364860534668
+2023-07-12 21:52:10,529 - root - INFO - Face detecting: 1.1789236068725586
+2023-07-12 21:52:10,637 - root - INFO - Sex&age detecting: 0.10808348655700684
+2023-07-12 21:52:10,637 - root - INFO - all_time of execution: 1.2873549461364746
+2023-07-12 21:53:19,969 - root - INFO - Face detecting: 3.940664052963257
+2023-07-12 21:53:20,084 - root - INFO - Sex&age detecting: 0.11456727981567383
+2023-07-12 21:53:20,084 - root - INFO - all_time of execution: 4.061951160430908
+2023-07-12 21:53:33,384 - root - INFO - Face detecting: 4.256891489028931
+2023-07-12 21:53:33,499 - root - INFO - Sex&age detecting: 0.11514973640441895
+2023-07-12 21:53:33,499 - root - INFO - all_time of execution: 4.376636743545532
+2023-07-12 21:53:44,455 - root - INFO - Face detecting: 3.526916265487671
+2023-07-12 21:53:44,565 - root - INFO - Sex&age detecting: 0.11017274856567383
+2023-07-12 21:53:44,565 - root - INFO - all_time of execution: 3.6427080631256104
+2023-07-12 21:54:09,820 - root - INFO - Face detecting: 4.87993049621582
+2023-07-12 21:54:09,936 - root - INFO - Sex&age detecting: 0.11501884460449219
+2023-07-12 21:54:09,936 - root - INFO - all_time of execution: 5.002319574356079
+2023-07-12 21:54:50,782 - root - INFO - Face detecting: 1.6243736743927002
+2023-07-12 21:54:50,884 - root - INFO - Sex&age detecting: 0.10183835029602051
+2023-07-12 21:54:50,884 - root - INFO - all_time of execution: 1.7266108989715576
