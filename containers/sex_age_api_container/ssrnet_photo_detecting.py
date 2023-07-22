@@ -14,6 +14,8 @@ from moviepy.editor import *
 from keras import backend as K
 import time
 from funcs.img_process import get_y_coords, get_smaller_img
+
+
 # from streamlit_service import logger
 # from streamlit.logger import get_logger
 # logger = get_logger(__name__)
@@ -25,12 +27,13 @@ def draw_label(image, point, label, font=cv2.FONT_HERSHEY_SIMPLEX,
     cv2.rectangle(image, (x, y - size[1]), (x + size[0], y), (255, 0, 0), cv2.FILLED)
     cv2.putText(image, label, point, font, font_scale, (255, 255, 255), thickness)
 
-def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_gender,time_detection,time_network,time_plot):
 
+def draw_results(detected, input_img, faces, ad, img_size, img_w, img_h, model, model_gender, time_detection,
+                 time_network, time_plot):
     souurce_img = input_img.copy()
 
-    #for i, d in enumerate(detected):
-    for i, (x,y,w,h,_) in enumerate(detected):
+    # for i, d in enumerate(detected):
+    for i, (x, y, w, h, _) in enumerate(detected):
 
         x1 = int(x)
         y1 = int(y)
@@ -62,7 +65,7 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
             faces[i, :, :, :] = cv2.resize(souurce_img[yw1:yw2 + 1, xw1:xw2 + 1, :], (img_size, img_size),
                                            interpolation=cv2.INTER_AREA)
 
-        faces[i,:,:,:] = cv2.normalize(faces[i,:,:,:], None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
+        faces[i, :, :, :] = cv2.normalize(faces[i, :, :, :], None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
 
         cv2.rectangle(input_img, (x1, y1), (x2, y2), (255, 0, 0), 2)
         cv2.rectangle(input_img, (xw1, yw1), (xw2, yw2), (0, 0, 255), 2)
@@ -75,7 +78,7 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
         # cv2.imshow("result", souurce_img)
         # cv2.waitKey(1)
         # time.sleep(2)
-    
+
     start_time = timeit.default_timer()
     if len(detected) > 0:
         # predict ages and genders of the detected faces
@@ -83,7 +86,7 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
         predicted_genders = model_gender.predict(faces)
 
     # draw results
-    for i, (x,y,w,h,_) in enumerate(detected):
+    for i, (x, y, w, h, _) in enumerate(detected):
 
         x1 = int(x)
         y1 = int(y)
@@ -91,30 +94,29 @@ def draw_results(detected,input_img,faces,ad,img_size,img_w,img_h,model,model_ge
         y2 = int(h)
 
         gender_str = 'male'
-        if predicted_genders[i]<0.5:
+        if predicted_genders[i] < 0.5:
             gender_str = 'female'
 
-        label = "{},{}".format(int(predicted_ages[i]),gender_str)
-        
+        label = "{},{}".format(int(predicted_ages[i]), gender_str)
+
         draw_label(input_img, (x1, y1), label)
-    
-    elapsed_time = timeit.default_timer()-start_time
+
+    elapsed_time = timeit.default_timer() - start_time
     time_network = time_network + elapsed_time
 
     start_time = timeit.default_timer()
 
-    elapsed_time = timeit.default_timer()-start_time
+    elapsed_time = timeit.default_timer() - start_time
     time_plot = time_plot + elapsed_time
 
-    return input_img,time_network,time_plot
+    return input_img, time_network, time_plot
 
 
 # Функция разметки изображений из указынной директории (результаты разметки так же кладутся в указынную диркеторию)
 def main():
-
-    K.set_learning_phase(0) # make sure its testing mode
+    K.set_learning_phase(0)  # make sure its testing mode
     weight_file = "./pre-trained/morph2/ssrnet_3_3_3_64_1.0_1.0/ssrnet_3_3_3_64_1.0_1.0.h5"
-    weight_file_gender = "./pre-trained/wiki_gender_models/ssrnet_3_3_3_64_1.0_1.0/ssrnet_3_3_3_64_1.0_1.0.h5"
+    weight_file_gender = "./pre-trained/wiki_gender_models/ssrnet_3_3_3_64_1.0_1.0/с_3_3_3_64_1.0_1.0.h5"
 
     path_source_img = './media_content/foto4/'
     save_path = './demo/img/'
@@ -132,15 +134,15 @@ def main():
 
     # load model and weights
     img_size = 64
-    stage_num = [3,3,3]
+    stage_num = [3, 3, 3]
     lambda_local = 1
     lambda_d = 1
-    model = SSR_net(img_size,stage_num, lambda_local, lambda_d)()
+    model = SSR_net(img_size, stage_num, lambda_local, lambda_d)()
     model.load_weights(weight_file)
 
-    model_gender = SSR_net_general(img_size,stage_num, lambda_local, lambda_d)()
+    model_gender = SSR_net_general(img_size, stage_num, lambda_local, lambda_d)()
     model_gender.load_weights(weight_file_gender)
-    
+
     # capture video
     paths_img = os.listdir(path_source_img)
 
@@ -159,25 +161,25 @@ def main():
         start_time = timeit.default_timer()
         detections = detector.detect(input_img)
 
-        elapsed_time = timeit.default_timer()-start_time
+        elapsed_time = timeit.default_timer() - start_time
         time_detection = time_detection + elapsed_time
 
         faces = np.empty((len(detections), img_size, img_size, 3))
 
-        input_img, time_network, time_plot = draw_results(detections,input_img,faces,ad,img_size,img_w,img_h,model,model_gender,time_detection,time_network,time_plot)
-        cv2.imwrite(save_path+str(img_idx)+'.png',input_img)
+        input_img, time_network, time_plot = draw_results(detections, input_img, faces, ad, img_size, img_w, img_h,
+                                                          model, model_gender, time_detection, time_network, time_plot)
+        cv2.imwrite(save_path + str(img_idx) + '.png', input_img)
 
-        #Show the time cost (fps)
-        print('avefps_time_detection:',1/time_detection)
+        # Show the time cost (fps)
+        print('avefps_time_detection:', 1 / time_detection)
         print('===============================')
         cv2.waitKey(1)
-        
+
     return input_img
 
 
 # Функция разметки одного изображения (принимает изображение от пользователя и возвращает размеченное)
 def get_tagged_img(input_img, logger, img_size, detector, model, model_gender):
-
     """
     Inputs:
         input_img - исходное изображение (numpy массив)

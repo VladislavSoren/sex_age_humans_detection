@@ -9,11 +9,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import logging
 
-from functions_support import get_models, show_input_image, show_tagged_image
+from functions_support import get_models
 from ssrnet_photo_detecting import get_tagged_img
-
-# from items_views import router as items_router
-# from users.views import router as users_router
 
 # Параметры логирования
 logging.basicConfig(filename="models_predict.log",
@@ -25,16 +22,6 @@ app = FastAPI()
 
 # Подгружаем модели при иницилаизации сервиса
 img_size, detector, model, model_gender = get_models()
-
-
-# app.include_router(
-#     items_router,
-#     prefix='/items',
-# )
-# app.include_router(
-#     users_router,
-#     prefix='/users',
-# )
 
 
 # Обработка запроса на корень нашего сервиса
@@ -63,8 +50,6 @@ def get_image(json_input: PredictRequest):
     #  deserialization
     image_bytes = base64.b64decode(json_input.image)
 
-    # show_input_image()
-
     # image preprocessing
     file_bytes = np.asarray(bytearray(image_bytes), dtype=np.uint8)
     input_image_cv = cv2.imdecode(file_bytes, 1)
@@ -76,8 +61,6 @@ def get_image(json_input: PredictRequest):
     if not os.path.exists('users_detections'): os.makedirs('users_detections')
     save_path = f'users_detections/{json_input.image_name}'
     cv2.imwrite(save_path, tagged_image)
-
-    # show_tagged_image(tagged_image)
 
     # serialization
     json_out = {}
